@@ -1,47 +1,39 @@
-// 堆排序即是将数组看作堆，堆为二叉树结构，即利用树结构降低复杂度，通过每个树节点和左右子节点进行对比，
-// 将最大值交换至根节点，再将最大值和最右节点交换，依次循环。。。
-// 同其他利用树结构的算法一样，其时间复杂度为 O(nlogn), 基本上是内部交换，空间复杂度为O(1)
+/**
+ * 共分为三部：
+ * 1. 创建大顶堆
+ * 2. 顶部和尾部换位置，缩小heapSize, 重复大顶堆化
+ * 3. heapSize缩小至0即全部排序完毕
+ * @param {Array} arr 
+ * @returns arr
+ */
 function heapSort(arr) {
-  const getLeftIndex = (index) => 2 * index + 1;
-  const getRightIndex = (index) => 2 * index + 2;
-  const getValBase = (isLeft) => (i, len) => {
-    const endIndex = len - 1;
-    const index = isLeft ? getLeftIndex(i) : getRightIndex(i);
-    if (index > endIndex) return -Infinity;
-    return arr[index];
-  };
-  const getLeft = getValBase(true);
-  const getRight = getValBase();
-  const getLeafStartIndex = (len) => {
-    const depth = Math.ceil(Math.log2(len + 1));
-    return Math.pow(2, depth - 1) - 1;
-  };
-  const getMaxNodeIndex = (index, len) => {
-    const leftVal = getLeft(index, len);
-    const rightVal = getRight(index, len);
-    let maxIndex = index;
-    if (leftVal > arr[maxIndex]) {
-      maxIndex = getLeftIndex(index);
+  let heapSize = arr.length - 1;
+  const swap = (ar, i, j) =>{[ar[i], ar[j]] = [ar[j], ar[i]]};
+  const maxHeapify = (ar, i) => {
+    const left = 2*i + 1;
+    const right = 2*i + 2;
+    let largest = i;
+    if(left<= heapSize && ar[left]>ar[largest]) {
+      largest = left
     }
-    if (rightVal > arr[maxIndex]) {
-      maxIndex = getRightIndex(index);
+    if(right<=heapSize && ar[right]>ar[largest]) {
+      largest = right
     }
-    return maxIndex;
-  };
-  const swap = (p1, p2) => ([arr[p1], arr[p2]] = [arr[p2], arr[p1]]);
-  const heapCompare = (isFromBottom) => (len) => {
-    const endIndex = getLeafStartIndex(len) - 1;
-    for (let i = 0; i <= endIndex; i++) {
-      const calcIndex = isFromBottom ? endIndex - i : i;
-      swap(calcIndex, getMaxNodeIndex(calcIndex, len));
+    if(largest!==i) {
+      swap(ar, i, largest)
+      maxHeapify(ar, largest)
     }
-    swap(0, len - 1);
-  };
-  const compareFromBottom = heapCompare(true);
-  // 堆排序主要过程
-  let len = arr.length;
-  while (len) {
-    compareFromBottom(len--);
   }
-  return arr;
+  const buildMaxHeap = (ar)=>{
+    for(let i=~~((ar.length-1)/2);i>=0;i--) {
+      maxHeapify(ar, i)
+    }
+  }
+  buildMaxHeap(arr);
+  while(heapSize>0) {
+    swap(arr, 0, heapSize);
+    heapSize--
+    maxHeapify(arr, 0)
+  }
+  return arr
 }
