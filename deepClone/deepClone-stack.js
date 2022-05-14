@@ -1,35 +1,29 @@
-function cloneDeep(data) {
-  const isReference = (val) => val && typeof val === "object";
+const cloneDeep = (obj) => {
+  const isReference = (val) => val instanceof Object;
   const cache = new WeakMap();
-  let checkArr = [{ parent: null, key: null, value: data }];
-  let checkItem = null;
-  let rtn = null;
-  const setRtn = (obj) => {
-    const { parent, key, value } = obj;
-    if (!parent && !key) {
-      rtn = value;
-    } else {
+  const root = { value: obj };
+  let checkItems = [{ parent: root, key: "value", value: obj }];
+  while (checkItems.length) {
+    const { parent, key, value } = checkItems.shift();
+    if (cache.has(value)) {
+      parent[key] = cache.get(value);
+    } else if (!isReference(value)) {
       parent[key] = value;
-    }
-  };
-  while (checkArr.length) {
-    let checkItem = checkArr.shift();
-    const { value: checkVal } = checkItem;
-    if (!isReference(checkVal)) {
-      setRtn(checkItem);
     } else {
-      if (cache.has(checkVal)) {
-        setRtn({ ...checkItem, value: cache.get(checkVal) });
-      } else {
-        const ref = new checkVal.constructor();
-        cache.set(checkVal, ref);
-        setRtn({ ...checkItem, value: ref });
-        const keys = Object.getOwnPropertyNames(checkVal);
-        checkArr = keys
-          .map((key) => ({ parent: ref, key, value: checkVal[key] }))
-          .concat(checkArr);
-      }
+      const cloneItem = new value.constructor();
+      parent[key] = cloneItem;
+      cache.set(value, cloneItem);
+      const keys = Object.getOwnPropertyNames(value);
+      checkItems = checkItems.concat(
+        keys.map((key) => {
+          return {
+            parent: cloneItem,
+            key,
+            value: value[key],
+          };
+        })
+      );
     }
   }
-  return rtn;
-}
+  return root.value;
+};

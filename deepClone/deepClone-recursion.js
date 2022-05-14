@@ -1,5 +1,5 @@
 function cloneDeep(data) {
-  const isReference = (val) => val && typeof val === "object";
+  const isReference = (val) => val instanceof Object;
   // 防止循环引用，利用weakMap缓存已拷贝的对象
   const cache = new WeakMap();
   const cloneData = (val) => {
