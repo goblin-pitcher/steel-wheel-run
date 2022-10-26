@@ -1,45 +1,30 @@
 class Scheduler {
   constructor(maxParallel) {
-    this._maxParallel = maxParallel;
-    this._activeTaskSt = new Set();
-    this._taskList = [];
+      this.max = maxParallel
+      this._active = new Set();
+      this._cache = []
   }
-  get _isWaiting() {
-    return this._activeTaskSt.size >= this._maxParallel;
+  add(task) {
+      return new Promise(resolve=>{
+          const decoFunc = async () => {
+              const res = await task()
+              resolve(res)
+          }
+          this._addCache(decoFunc)
+      })
   }
-
-  async add(task) {
-    const rst = await this._execTask(task);
-    return rst;
+  _addCache(decoTask){
+      this._cache.push(decoTask);
+      this._notify()
   }
-  _getNextTask() {
-    if (this._taskList.length) return this._taskList.shift();
-    return null;
-  }
-  _getDecoTask(task, callback) {
-    const promisifyTask = async () => {
-      const res = await task();
-      callback(res);
-    };
-    return promisifyTask;
-  }
-  _execTask(task) {
-    return new Promise((resolve) => {
-      const decoTask = this._getDecoTask(task, resolve);
-      if (this._isWaiting) {
-        this._taskList.push(decoTask);
-        return;
-      }
-      const p = decoTask();
-      this._activeTaskSt.add(p);
-      p.then(() => {
-        this._activeTaskSt.delete(p);
-        const nextTask = this._getNextTask();
-        if (nextTask) {
-          this._execTask(nextTask);
-        }
-      });
-    });
+  _notify(){
+      if(!this._cache.length || this._active.size>=this.max) return;
+      const task = this._cache.shift();
+      const addTask = task().then(()=>{
+          this._active.delete(addTask)
+          this._notify()
+      })
+      this._active.add(addTask)
   }
 }
 

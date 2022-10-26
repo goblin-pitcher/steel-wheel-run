@@ -1,7 +1,7 @@
 const statusEnum = {
   PENDING: "pending",
   FULLFILED: "fulfilled",
-  REJECTED: "rejected",
+  REJECTED: 'rejected'
 };
 /**
  *
@@ -13,7 +13,7 @@ const statusEnum = {
 const resolvePromise = (promise, value, resolve, reject) => {
   if (promise === value) {
     throw TypeError("报错....");
-  } else if (typeof value?.then === "function") {
+  } else if (typeof value.then === "function") {
     // 注意，这里值判断p.then，所有复合promise A+协议的promise实现都是可以互相调用的
     value.then(resolve, reject);
   } else {

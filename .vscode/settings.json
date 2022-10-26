@@ -1,0 +1,9 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true
+    },
+    // "eslint.codeActionsOnSave.mode": "problems",
+    "redhat.telemetry.enabled": true,
+}

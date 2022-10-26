@@ -11,7 +11,7 @@ function schedule() {
 function App() {
   const [num, updateNum] = useState(0);
 
-  console.log(`${isMount ? 'mount' : 'update'} num: `, num);
+  console.log(`${isMount ? "mount" : "update"} num: `, num);
 
   return {
     click() {
