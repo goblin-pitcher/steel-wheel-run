@@ -104,8 +104,13 @@ const parseObj = (data) => {
         }
         return paths
     }
+    const typeOf = val => {
+        const fulType = Object.prototype.toString.call(val);
+        const trimLast = (str) => str.substring(0, str.length - 1);
+        return trimLast(fulType.split(/\s/)[1]).toLowerCase()
+    }
     // 这里指处理数组和Object，因此只判断这两种类型
-    const isReference = (val) => Array.isArray(val) || (val && typeof val ==='object')
+    const isReference = (val) => ['array', 'object'].includes(typeOf(val))
     const setValByPath = (paths, val) => {
         let start = rtn
         const getDefValByPath = (path) => {
